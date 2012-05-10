@@ -6,7 +6,7 @@ cg.views.IdeaView = Backbone.View.extend({
     template: _.template($('#idea-template').html()),
 
     events: {
-        'click .save'       : 'save',
+        'click #save'       : 'save',
     },
 
     initialize: function() {
@@ -16,15 +16,19 @@ cg.views.IdeaView = Backbone.View.extend({
     },
 
     render: function() {
+        console.log("IdeaView::render");
+        // we pass the model in here because we want to call functions
+        // on it, like item.owned_by_current_user();
         this.$el.html(
             this.template({item:this.model}));
-                //this.model.toJSON()))
         return this;
     },
 
     save: function() {
+        console.log("IdeaView::save");
         // TODO: validation
-        this.model.save()
+        console.log(this.model);
+        this.model.save();
     }
 
 });

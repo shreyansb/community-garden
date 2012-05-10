@@ -30,17 +30,24 @@
 
         <script type="text/template" id="idea-template">
             <div>
-                <div>
-                    <% if (item.owned_by_current_user()) { %>
-                        <input id="item_short_desc" type="text" 
-                            value="<%= item.get('short_desc') %>"/>
-                        <input id="item_long_desc" type="text" 
-                            value="<%= item.get('long_desc') %>"/>
-                    <% } else {%>
-                        <%= item.get('short_desc') %>
-                        <%= item.get('long_desc') %>
-                    <% } %>
-                </div>
+                <% if (item.owned_by_current_user()) { %>
+                    <input id="item_short_desc" type="text" 
+                        value="<%= item.get('short_desc') %>"/>
+                    <input id="item_long_desc" type="text" 
+                        value="<%= item.get('long_desc') %>"/>
+                <% } else {%>
+                    <%= item.get('short_desc') %>
+                    <%= item.get('long_desc') %>
+                <% } %>
+                <input id="item_tags" type="text"
+                    value="<%= item.tags() %>"/>
+                <button id="save">save</button>
+            </div>
+        </script>
+
+        <script type="text/template" id="new-idea-template">
+            <div>
+
             </div>
         </script>
 
