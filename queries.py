@@ -1,7 +1,7 @@
 import pymongo
 import bson
 
-from model.queries import Link, User, Idea
+from models import Link, User, Idea
 
 
 ##
@@ -52,58 +52,59 @@ def apply_all_indexes(db, indexes, collection):
 ##
 ##  Methods to save, load and update a user
 ##
-def load_user(db, user_id=None):
+def get_user(db, user_id):
     """Loads a user document from MongoDB.
     """
-    query_dict = dict()
-    if user_id:
-        query_dict['user_id']
+    spec = {"_id":user_id}
+    
+    user_dict = db[USER_COLLECTION].find_one(spec)
+
+    if user_dict:
+        user = User(**user_dict)
+        return user
     else:
-        raise ValueError('User_id required')
-
-    user_dict = db[USER_COLLECTION].find_one(query_dict)
-
-    if user_dict is None:
         return None
-    else:
-        u = User(**user_dict)
-        return u
 
-def save_user(db, user):
+def create_or_update_user(db, user):
     """Saves a user document from MongoDB.
     """
     user_doc = user.to_python()
-    uid = db[USER_COLLECTION].insert(user_doc)
-    user._id = uid
-    
-    return uid
-
+    spec = {"_id":user.id}
+    db[USER_COLLECTION].insert(spec, document= {'$set':user_doc}, upsert=True, safe=True)
+    return user
 
 ##
 ##  Methods to save, load and update an idea
 ##
-def load_idea(db, idea_id=None):
+def get_idea(db, idea_id):
     """Loads an idea document from MongoDB.
-    """
-    query_dict = dict()
-    if idea_id:
-        query_dict['idea_id']
+"""
+    spec = {"_id":idea_id}
+    
+    idea_dict = db[IDEA_COLLECTION].find_one(spec)
+
+    if idea_dict:
+        idea = Idea(**idea_dict)
+        return idea
     else:
-        raise ValueError('Idea id required')
-
-    idea_dict = db[IDEA_COLLECTION].find_one(query_dict)
-
-    if idea_dict is None:
         return None
-    else:
-        i = Idea(**idea_dict)
-        return i
 
-def save_idea(db, idea):
+
+def create_or_update_idea(db, idea):
     """Saves a user document from MongoDB.
     """
     idea_doc = idea.to_python()
-    uid = db[IDEA_COLLECTION].insert(idea_doc)
-    idea._id = uid
+    idea_add_to_set_keys = ['tags_list', 'likes_list']
     
-    return uid
+    set_doc = {}
+    add_to_set_doc = {} 
+    
+    for key, value in idea_doc.iteritems():
+        if key in idea_add_to_set_keys:
+            add_to_set_doc[key] = value
+        else:
+            set_doc[key] = value
+    
+    spec = {"_id":idea.id}
+    db[IDEA_COLLECTION].update(spec, document={'$set':set_doc, '$addToSet':add_to_set_doc}, upsert=True, safe=True)
+    return idea

@@ -12,65 +12,98 @@ import logging
 import uuid
 
 from queries import (init_db_conn,
-                     save_user,
-                     load_user,
-                     save_idea,
-                     load_idea)
+                     create_or_update_user,
+                     get_user,
+                     create_or_update_idea,
+                     get_idea)
+from models import (User,
+                    Idea)
 
 class BaseHandler(tornado.web.RequestHandler):
     @property
     def db(self):
         return self.application.db
-
+    
     def get_current_user(self):
-        user_id = self.get_argument("user_id")
-        if not user_id:
-            # create a user
-            return None
-        return self.db.get()
+        # First see if user_id exists
+        user_id = self.get_argument('user_id', None)
+        user_email = self.get_argument('user_email', None)
+        
+        user = get_user(self.db, user_id)
+        
+        # Add user if it doesn't exist
+        if not user:
+            user = self.add_new_user(user_id, user_email)
+        return user
+        
+    def add_new_user(self, user_id, user_email):
+        u = User()
+        u.id = user_id
+        u.email = user_email
+        
+        try:
+            u.validate()
+            print 'Validation passed\n'
+        except Exception, e:
+            logging.error('Item validation failed')
+            logging.error(e)
+            return self.render_error(500)
+        
+        user = create_or_update_user(self.db, u)
+        return user
 
 class MainHandler(BaseHandler):
     def get(self):
+        return None
         
     def post(self):
-
+        return None
 
 class IdeaHandler(BaseHandler):
     """Get a specific idea by id
     """
     def get(self):
-
+        return None
     """Post a new idea to the database or update an existing idea
     """
     def post(self):
+        logging.info("Posting an idea")
+        
         idea_id = self.get_argument('idea_id', None)
         
         if not idea_id:
-            return None
+            logging.error('Item validation failed')
+            logging.error(e)
+            return self.render_error(500)
             
-        idea_doc = load_idea(idea_id)
+        idea = get_idea(self.db, idea_id)
         
-        if not idea_doc:
-            self.create_idea(idea_id)
+        if not idea:
+            response = self.create_idea(idea_id)
         else:
-            self.update_idea(idea_doc)
+            response = self.update_idea(idea)
+
+        self.write(response)
+        self.finish()
     
     def update_idea(self, idea_doc):
+        logging.info("Updating an idea")
         # If the user_id is the same as the owner_id, allow to update more things
-        user_id = self.get_argument('user_id', None)
-        tags = self.get_argument('tags', None)
-        short_desc = self.get_argument('short_desc', None)
-        long_desc = self.get_argument('long_desc', None)
-        use_cases = self.get_argument('use_cases', None)    
+        
     
-    def create_idea(self):
+    
+    def create_idea(self, idea_id):
+        logging.info("Creating an idea")
+        
+        user = self.get_current_user()
+        
         i = Idea()
-        i.owner_id = self.get_argument('owner_id', None)
-        i.owner_email = self.get_argument('owner_email', None)
+        i.id = idea_id
+        i.owner_id = user.id
         i.short_desc = self.get_argument('short_desc', None)
         i.long_desc = self.get_argument('long_desc', None)
         i.use_cases = self.get_argument('use_cases', None)
-        i.tags = self.get_argument('tags', None)
+        i.tags_list = self.get_arguments('tags', None)
         
         try:
             i.validate()
@@ -80,8 +113,9 @@ class IdeaHandler(BaseHandler):
             logging.error(e)
             return self.render_error(500)
         
-        save_idea(self.db_conn, i)
-        return self.finish()
+        response = create_or_update_idea(self.db, i)
+        print "response", response.to_python()
+        return response
         
     
 settings = {
@@ -105,6 +139,3 @@ if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(9001)
     tornado.ioloop.IOLoop.instance().start()
-
-
-# self.db
