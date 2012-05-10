@@ -19,6 +19,7 @@ cg.controllers.IdeaRouter = Backbone.Router.extend({
 
         _.bindAll(this, 'homepage',
                         'newIdea',
+                        'renderIdea',
                         'loadIdeaFromModel', 
                         'loadIdeaById');
 
@@ -30,6 +31,7 @@ cg.controllers.IdeaRouter = Backbone.Router.extend({
                             {'short_desc':'two', 
                                 'long_desc':'airbnb for your mom', 
                                 'id':2,
+                                'tags': 'airbnb, mom',
                                 'owner_id': 'asdfasfasfd'
                             }]
 
@@ -51,7 +53,7 @@ cg.controllers.IdeaRouter = Backbone.Router.extend({
 
     newIdea: function() {
         console.log("IdeaRouter::newIdea");
-        var idea = new cg.models.Idea();
+        var idea = new cg.models.Idea({owner_id:cg.userId});
         cg.views.newIdea = new cg.views.IdeaView({model:idea});
 
     },
