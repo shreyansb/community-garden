@@ -1,0 +1,76 @@
+<html>
+    <head>
+        <title>Community Garden</title>
+        <link rel="stylesheet" href="static/css/cg.css"/>
+    </head>
+    <body>
+        <header>
+            <h1>Feelin it</h1>
+        </header>
+
+        <div id="content">
+
+        </div>
+
+        <footer>
+            Thanks.
+        </footer>
+
+
+        <!-- Templates -->
+
+        <script type="text/template" id="idea-list-item-template">
+            <div>
+                <%= short_desc %>: <%= long_desc %>
+                <% if (owner_id == cg.userId) { %>
+                    ---> yours
+                <% } %>
+            </div>
+        </script>
+
+        <script type="text/template" id="idea-template">
+            <div>
+                <div>
+                    <% if (item.owned_by_current_user()) { %>
+                        <input id="item_short_desc" type="text" 
+                            value="<%= item.get('short_desc') %>"/>
+                        <input id="item_long_desc" type="text" 
+                            value="<%= item.get('long_desc') %>"/>
+                    <% } else {%>
+                        <%= item.get('short_desc') %>
+                        <%= item.get('long_desc') %>
+                    <% } %>
+                </div>
+            </div>
+        </script>
+
+
+        <!-- Imports -->
+
+        <script src="static/js/setup_application.js"></script>
+        <script src="static/js/external/json2.js"></script>
+        <script src="static/js/external/jquery-1.7.2.js"></script>
+        <script src="static/js/external/underscore.js"></script>
+        <script src="static/js/external/backbone.js"></script>
+        <script src="static/js/external/backbone-localstorage.js"></script>
+        <script src="static/js/utils.js"></script>
+        <script src="static/js/models.js"></script>
+        <script src="static/js/collections.js"></script>
+        <script src="static/js/views.ideas.js"></script>
+        <script src="static/js/views.homepage.js"></script>
+        <script src="static/js/views.app.js"></script>
+        <script src="static/js/router.js"></script>
+        <script>
+            $(function() { 
+                ////
+                //// Start the router, and thus the app
+                ////
+                console.log("cg::starting router");
+                cg.app = new cg.controllers.IdeaRouter;
+                Backbone.history.start();
+                console.log("cg::app started");
+            });
+        </script>
+        
+    </body>
+</html>
