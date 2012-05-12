@@ -19,6 +19,14 @@
 
         <!-- Templates -->
 
+        <script type="text/template" id="homepage-template">
+            <div id="idea_list">
+                <ul id="idea_list_ul">
+                </ul>
+                <button id="new_idea">add an idea</button>
+            </div>
+        </script>
+
         <script type="text/template" id="idea-list-item-template">
             <div>
                 <%= short_desc %>: <%= long_desc %>
@@ -29,6 +37,9 @@
         </script>
 
         <script type="text/template" id="idea-template">
+            <div>
+                <button id="back_to_home_button">home</button>
+            </div>
             <div>
                 <div class='possible_input'>
                     <label>In 5 words:<br/>

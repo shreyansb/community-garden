@@ -6,10 +6,12 @@ cg.views.IdeaView = Backbone.View.extend({
     template: _.template($('#idea-template').html()),
 
     events: {
-        'click #save'       : 'save',
+        'click #save'                   : 'save',
+        'click #back_to_home_button'    : 'backToHome'
     },
 
     initialize: function() {
+        console.log("IdeaView::initialize");
         // re-render the view when the model changes
         this.model.bind('change', this.render, this); 
         this.render();
@@ -17,6 +19,7 @@ cg.views.IdeaView = Backbone.View.extend({
 
     render: function() {
         console.log("IdeaView::render");
+        this.setHash();
         // we pass the model in here because we want to call functions
         // on it, like item.owned_by_current_user();
         this.$el.html(
@@ -29,6 +32,21 @@ cg.views.IdeaView = Backbone.View.extend({
         // TODO: validation
         console.log(this.model);
         this.model.save();
+    },
+
+    backToHome: function() {
+        console.log("IdeaView::backToHome");
+        this.trigger('clickBackToHome')
+    },
+
+    setHash: function() {
+        console.log("IdeaView::setHash");
+        var current_id = this.model.get('id');
+        if (current_id)
+            current_id = current_id.toString();
+        else
+            current_id = 'new'
+        cg.app.navigate('/' + current_id);
     }
 
 });
