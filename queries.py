@@ -1,7 +1,6 @@
 import pymongo
-import bson
 
-from models import Link, User, Idea
+from models import User, Idea
 
 import logging
 
@@ -11,12 +10,13 @@ import logging
 ##
 DB_NAME = 'community_garden'
 USER_COLLECTION = 'users'
-indexes_users = [
+USER_INDEXES = [
     [('user_id', pymongo.ASCENDING)],
     [('user_email', pymongo.ASCENDING)]
 ]
+
 IDEA_COLLECTION = 'ideas'
-indexes_ideas = [
+IDEA_INDEXES = [
     [('owner_id', pymongo.ASCENDING)],
     [('owner_email', pymongo.ASCENDING)],
     [('idea_id', pymongo.ASCENDING)]
@@ -29,8 +29,8 @@ indexes_ideas = [
 def init_db_conn(**kwargs):
     dbc = pymongo.Connection(**kwargs)
     db_conn = dbc[DB_NAME]
-    apply_all_indexes(db_conn, indexes_users, USER_COLLECTION)
-    apply_all_indexes(db_conn, indexes_ideas, IDEA_COLLECTION)
+    apply_all_indexes(db_conn, USER_INDEXES, USER_COLLECTION)
+    apply_all_indexes(db_conn, IDEA_INDEXES, IDEA_COLLECTION)
     return db_conn
 
 def end_request(db_conn):

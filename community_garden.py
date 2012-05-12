@@ -1,5 +1,4 @@
 import os
-import re
 import tornado
 import tornado.httpserver
 import tornado.autoreload
@@ -7,9 +6,7 @@ import tornado.escape
 import tornado.httpclient
 import tornado.ioloop
 import tornado.web
-import simplejson as json
 import logging
-import uuid
 
 from uuid import UUID
 
@@ -136,8 +133,11 @@ class IdeaHandler(BaseHandler):
         return self.validate_and_write_idea(i)
     
 class LikeHandler(BaseHandler):
+
     def post(self):
-        """ Add another like to the idea
+        """Given an idea_id and a user_id, increase the 
+        like count on the idea, if the user hasn't already
+        liked it
         """
         user = self.get_current_user()
         idea = self.get_current_idea_if_exists()
@@ -146,7 +146,7 @@ class LikeHandler(BaseHandler):
             raise tornado.web.HTTPError(400)
         
         if user.id not in idea.likes_list:
-            idea.likes_list.append(user_id)
+            idea.likes_list.append(user.id)
             idea.likes_count =+ 1
             self.validate_and_write_idea(idea)
             
