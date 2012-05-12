@@ -1,21 +1,20 @@
-import dictshield
-from dictshield.document import diff_id_field
-from dictshield.document import Document, EmbeddedDocument
-from dictshield.fields.mongo import ObjectIdField
-from dictshield.fields import (StringField, URLField, EmailField,
-                                DateTimeField, UUIDField, IntField)
-
-from dictshield.fields.compound import ListField, EmbeddedDocumentField
+from dictshield.document import (Document, 
+                                 EmbeddedDocument)
+from dictshield.fields import (StringField, 
+                               URLField, 
+                               DateTimeField, 
+                               UUIDField, 
+                               IntField)
+from dictshield.fields.compound import (ListField,
+                                        EmbeddedDocumentField)
 import datetime
-
-from bson.objectid import ObjectId
 
 class Link(EmbeddedDocument):
     title = StringField(required=True)
     url = URLField(required=True)
 
 class User(Document):
-    email = EmailField(required=True)
+    pass
 
 class Idea(Document):
     owner_id = UUIDField()

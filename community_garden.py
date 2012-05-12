@@ -8,7 +8,7 @@ import tornado.ioloop
 import tornado.web
 import logging
 
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from queries import (init_db_conn,
                      create_or_update_user,
@@ -26,26 +26,27 @@ class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         # First see if user_id exists
         user_id = self.get_argument('user_id', None)
-        user_email = self.get_argument('user_email', None)
         
-        user_id_UUID = UUID(user_id)
+        if user_id:
+            user_id_UUID = UUID(user_id)
+        else:
+            user_id_UUID = uuid4()
         
         user = get_user(self.db, user_id_UUID)
         
         # Add user if it doesn't exist
         if not user:
-            user = self.add_new_user(user_id, user_email)
+            user = self.add_new_user(user_id)
         return user
         
-    def add_new_user(self, user_id, user_email):
+    def add_new_user(self, user_id):
         u = User()
         u.id = user_id
-        u.email = user_email
         
         try:
             u.validate()
             print 'Validation passed\n'
-        except Exception, e:
+        except Exception:
             raise tornado.web.HTTPError(400)
         
         user = create_or_update_user(self.db, u)
@@ -74,7 +75,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class MainHandler(BaseHandler):
     def get(self):
-        return None
+        return self.render('index.html')
         
     def post(self):
         return None

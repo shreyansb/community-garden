@@ -7,7 +7,11 @@ cg.views.IdeaView = Backbone.View.extend({
 
     events: {
         'click #save'                   : 'save',
-        'click #back_to_home_button'    : 'backToHome'
+        'click #back_to_home_button'    : 'backToHome',
+        'blur #item_short_desc'         : 'updateModel',
+        'blur #item_long_desc'          : 'updateModel',
+        'blur #item_use_cases'          : 'updateModel',
+        'blur #item_tags'               : 'updateModel'
     },
 
     initialize: function() {
@@ -29,7 +33,6 @@ cg.views.IdeaView = Backbone.View.extend({
 
     save: function() {
         console.log("IdeaView::save");
-        // TODO: validation
         console.log(this.model);
         this.model.save();
     },
@@ -47,6 +50,13 @@ cg.views.IdeaView = Backbone.View.extend({
         else
             current_id = 'new'
         cg.app.navigate('/' + current_id);
+    },
+
+    updateModel: function(event) {
+        console.log("IdeaView::updateModel");
+        var updatedEl = event.target.id;
+        var updatedVal = $('#' + updatedEl).val();
+        this.model.set(updatedEl, updatedVal);
     }
 
 });

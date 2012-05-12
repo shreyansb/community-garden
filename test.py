@@ -11,9 +11,9 @@ db[IDEA_COLLECTION].remove()
 user_id = uuid.uuid4()
 idea_id = uuid.uuid4()
 
-url = 'http://localhost:9001/idea?'
+url = 'http://localhost:9001/idea'
 doc = {
-        'idea_id':idea_id,
+        'id':idea_id,
         'user_id': user_id,
         'user_email': 'ashaegupta@gmail.com',
         'short_desc': 'Rooftop gardens',
@@ -23,7 +23,6 @@ doc = {
 }
 
 r = requests.post(url, data=doc)
-
 
 db[USER_COLLECTION].count()
 db[USER_COLLECTION].find_one()
@@ -38,11 +37,10 @@ doc = {
         'tags':'["green", "fresh air"]'
 }
 
-
 r = requests.post(url, data=doc)
 spec = {'_id': idea_id}
 idea_dict = db[IDEA_COLLECTION].find_one(spec)
 
-from models import Idea, User, Link
+from models import Idea
 idea = Idea(**idea_dict)
 print idea.to_python()

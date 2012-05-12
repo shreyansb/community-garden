@@ -46,7 +46,7 @@
                 <% if (item.owned_by_current_user()) { %>
                     <input id="item_short_desc" type="text" 
                         value="<%= item.get('short_desc') %>"/>
-                <% } else {%>
+                <% } else { %>
                     <%= item.get('short_desc') %>
                 <% } %>
                     </label>
@@ -57,7 +57,7 @@
                 <% if (item.owned_by_current_user()) { %>
                     <textarea id="item_long_desc"
                         ><%= item.get('long_desc') %></textarea>
-                <% } else {%>
+                <% } else { %>
                     <%= item.get('long_desc') %>
                 <% } %>
                     </label>
@@ -68,7 +68,7 @@
                 <% if (item.owned_by_current_user()) { %>
                     <textarea id="item_use_cases"
                         ><%= item.get('use_cases') %></textarea>
-                <% } else {%>
+                <% } else { %>
                     <%= item.get('use_cases') %>
                 <% } %>
                     </label>
@@ -99,7 +99,7 @@
         <script src="static/js/external/jquery-1.7.2.js"></script>
         <script src="static/js/external/underscore.js"></script>
         <script src="static/js/external/backbone.js"></script>
-        <script src="static/js/external/backbone-localstorage.js"></script>
+        <!--script src="static/js/external/backbone-localstorage.js"></script-->
         <script src="static/js/utils.js"></script>
         <script src="static/js/models.js"></script>
         <script src="static/js/collections.js"></script>

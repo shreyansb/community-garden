@@ -13,7 +13,8 @@ cg.models.Idea = Backbone.Model.extend({
             use_cases: '',
             tags: '',
             likes: 0,
-            links: []
+            links: [],
+            user_id: cg.userId
         }
     },
 
