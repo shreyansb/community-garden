@@ -81,7 +81,7 @@ def create_or_update_user(db, user):
 ##
 def get_idea(db, idea_id):
     """Loads an idea document from MongoDB.
-"""
+    """
     spec = {"_id":idea_id}
     
     idea_dict = db[IDEA_COLLECTION].find_one(spec)
@@ -96,6 +96,14 @@ def get_idea(db, idea_id):
     else:
         return None
 
+def get_ideas(db):
+    """Returns all the ideas in the database
+    """
+    ideas = db[IDEA_COLLECTION].find()
+    #ideas_list = [Idea.make_json_publicsafe(Idea(**i)) 
+    #              for i in ideas]
+    ideas_list = [i for i in ideas]
+    return ideas_list
 
 def create_or_update_idea(db, idea):
     """Saves a user document from MongoDB.
@@ -115,5 +123,8 @@ def create_or_update_idea(db, idea):
                 set_doc[key] = value
     
     spec = {"_id":idea.id}
-    db[IDEA_COLLECTION].update(spec, document={'$set':set_doc, '$addToSet':add_to_set_doc}, upsert=True, safe=True)
+    document = {"$set": set_doc,
+                "$addToSet": add_to_set_doc}
+    db[IDEA_COLLECTION].update(spec, document=document,
+                               upsert=True, safe=True)
     return idea

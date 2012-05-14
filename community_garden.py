@@ -14,9 +14,11 @@ from queries import (init_db_conn,
                      create_or_update_user,
                      get_user,
                      create_or_update_idea,
-                     get_idea)
+                     get_idea,
+                     get_ideas)
 from models import (User,
                     Idea)
+from utils import json_encode
 
 class BaseHandler(tornado.web.RequestHandler):
     @property
@@ -36,7 +38,7 @@ class BaseHandler(tornado.web.RequestHandler):
         
         # Add user if it doesn't exist
         if not user:
-            user = self.add_new_user(user_id)
+            user = self.add_new_user(user_id_UUID)
         return user
         
     def add_new_user(self, user_id):
@@ -81,10 +83,12 @@ class MainHandler(BaseHandler):
         return None
 
 class IdeaHandler(BaseHandler):
-    """Get a specific idea by id
-    """
     def get(self):
-        return None
+        ideas = get_ideas(self.db)
+        ideas = json_encode(ideas)
+        self.write(ideas)
+        self.finish()
+
     """Post a new idea to the database or update an existing idea
     """
     def post(self):

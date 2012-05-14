@@ -2,3 +2,5 @@ vm
 data
 plan.md
 todo.md
+*.pyc
+

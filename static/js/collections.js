@@ -5,7 +5,7 @@
 // initially backed by localstorage, eventually will talk to the server
 cg.collections.IdeaList = Backbone.Collection.extend({
     
-    url: '/ideas',
+    url: '/idea',
 
     model: cg.models.Idea
 

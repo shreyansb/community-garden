@@ -17,6 +17,9 @@ class User(Document):
     pass
 
 class Idea(Document):
+    _public_fields = ['owner_id', 'short_desc', 'long_desc', 'use_cases',
+                      'links', 'likes_count', 'likes_list', 'tags_list', 
+                      'created_date', 'updated_date']
     owner_id = UUIDField()
     short_desc = StringField(required=True)
     long_desc = StringField(required=True)

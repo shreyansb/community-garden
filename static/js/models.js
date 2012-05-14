@@ -14,7 +14,7 @@ cg.models.Idea = Backbone.Model.extend({
             tags: '',
             likes: 0,
             links: [],
-            user_id: cg.userId
+            owner_id: cg.userId
         }
     },
 

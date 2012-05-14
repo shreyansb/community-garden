@@ -26,15 +26,16 @@ cg.views.HomepageView = Backbone.View.extend({
         //// using fetch, not dummy data
         //// it uses a deferred, and when the loading is done, it
         //// calls renderEach on each model in the collection
-        //var fetching = cg.ideas.fetch();
-        //var _this = this;
-        //fetching.then(function() {
-        //    cg.ideas.each(_this.renderEach);
-        //});
-        cg.app.navigate("");
+        var fetching = cg.ideas.fetch();
         this.$el.html(
                 this.template());
-        cg.ideas.each(this.renderEach);
+        this.$(this.ulEl).empty();
+        var _this = this;
+        fetching.then(function() {
+            cg.ideas.each(_this.renderEach);
+        });
+        cg.app.navigate("");
+        //cg.ideas.each(this.renderEach);
         return this;
     },
 
@@ -47,7 +48,8 @@ cg.views.HomepageView = Backbone.View.extend({
         // if caught, call notifyParent
         item.on('clickIdea', this.notifyParent);
         // render the subview and append it to this view
-        this.$(this.ulEl).append(item.render().el);
+        var item_html = item.render().el;
+        this.$(this.ulEl).append(item_html);
     },
 
     notifyParent: function(child_model) {
@@ -85,7 +87,8 @@ cg.views.IdeaListItemView = Backbone.View.extend({
 
     render: function() {
         console.log("IdeaListItemView::render");
-        this.$el.html(this.template(this.model.toJSON()));
+        var item_html = this.template(this.model.toJSON());
+        this.$el.html(item_html);
         return this;
     },
 
