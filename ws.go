@@ -1,10 +1,11 @@
 package main
 
 import (
-	"code.google.com/p/go.net/websocket"
+    "code.google.com/p/go.net/websocket"
     "crypto/sha256"
     "encoding/base64"
     "log"
+    "math/rand"
     "time"
 )
 
@@ -21,11 +22,8 @@ func wsHandler(ws *websocket.Conn) {
         wsChan: make(chan string),
         id: randomId(),
     }
-    // handle incoming messages from the websocket
-    handleMessages(wsConn)
-}
 
-func handleMessages(wsConn *wsConnection) {
+    // receive a message and respond to it in a goroutine
     for {
         var message string
         err := websocket.Message.Receive(wsConn.ws, &message)
@@ -38,8 +36,11 @@ func handleMessages(wsConn *wsConnection) {
 }
 
 func respondToMessage(wsConn *wsConnection, message string) {
+    /* Respond to an incoming message.
+    Right now, simulates work by sleeping for a few seconds
+    */
     log.Printf("%v is processing a message", wsConn.id)
-    time.Sleep(10000 * time.Millisecond)
+    time.Sleep(time.Duration(rand.Int31n(5000)) * time.Millisecond)
     log.Printf("%v responded: %s", wsConn.id, message)
     err := websocket.Message.Send(wsConn.ws, message)
     if err != nil {
