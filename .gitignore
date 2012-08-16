@@ -3,4 +3,6 @@ data
 plan.md
 todo.md
 *.pyc
+v0.1/
+etc/
 
