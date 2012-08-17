@@ -8,8 +8,8 @@ import (
 )
 
 type wsConnection struct {
-	ws *websocket.Conn
-	wsChan chan string
+    ws *websocket.Conn
+    wsChan chan string
     id string
 }
 
@@ -45,8 +45,7 @@ func respondToMessage(wsConn *wsConnection, message wsMessage) {
     log.Printf("%v is processing a message", wsConn.id)
     time.Sleep(time.Duration(rand.Int31n(5000)) * time.Millisecond)
     log.Printf("%v responded: %s", wsConn.id, message)
-    bad_message := "haha"
-    err := websocket.JSON.Send(wsConn.ws, bad_message)
+    err := websocket.JSON.Send(wsConn.ws, message)
     if err != nil {
         log.Printf("handleMessages Send error: %v", err)
         return
