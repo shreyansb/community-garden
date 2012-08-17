@@ -2,8 +2,6 @@ package main
 
 import (
     "code.google.com/p/go.net/websocket"
-    "crypto/sha256"
-    "encoding/base64"
     "log"
     "math/rand"
     "time"
@@ -13,6 +11,11 @@ type wsConnection struct {
 	ws *websocket.Conn
 	wsChan chan string
     id string
+}
+
+type wsMessage struct {
+    Id string
+    Message string
 }
 
 func wsHandler(ws *websocket.Conn) {
@@ -25,8 +28,8 @@ func wsHandler(ws *websocket.Conn) {
 
     // receive a message and respond to it in a goroutine
     for {
-        var message string
-        err := websocket.Message.Receive(wsConn.ws, &message)
+        var message wsMessage
+        err := websocket.JSON.Receive(wsConn.ws, &message)
         if err != nil {
             log.Printf("handleMessages Receive error: %v", err)
             break
@@ -35,25 +38,17 @@ func wsHandler(ws *websocket.Conn) {
     }
 }
 
-func respondToMessage(wsConn *wsConnection, message string) {
+func respondToMessage(wsConn *wsConnection, message wsMessage) {
     /* Respond to an incoming message.
     Right now, simulates work by sleeping for a few seconds
     */
     log.Printf("%v is processing a message", wsConn.id)
     time.Sleep(time.Duration(rand.Int31n(5000)) * time.Millisecond)
     log.Printf("%v responded: %s", wsConn.id, message)
-    err := websocket.Message.Send(wsConn.ws, message)
+    bad_message := "haha"
+    err := websocket.JSON.Send(wsConn.ws, bad_message)
     if err != nil {
         log.Printf("handleMessages Send error: %v", err)
         return
     }
-}
-
-func randomId() string {
-    /* generates a random id based on the sha256 of the current time
-    there's probably a better way to generate ids
-    */
-    hasher := sha256.New()
-    hasher.Write([]byte((time.Now()).String()))
-    return string(base64.URLEncoding.EncodeToString(hasher.Sum(nil)))
 }
