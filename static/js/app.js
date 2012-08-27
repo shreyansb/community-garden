@@ -1,4 +1,5 @@
 var cg = cg || {};
+cg.connection_el_id = 'connection_status';
 
 // a mapping of messages sent to the server, and 
 // their associated callbacks
@@ -17,12 +18,12 @@ cg.retryingConnection = false;
 // called when a websocket connection is established
 // aka 'readyState === 1'
 cg.onopen = function () {
-    console.log("connection opened");
+    cg.log_to_el("connection opened");
 };
 
 // called when we receive an incoming message from the server
 cg.onmessage = function (event_) {
-    console.log("received message: " + event_.data);
+    cg.log_to_el("received message: " + event_.data);
     var incoming = JSON.parse(event_.data);
     if (incoming.Id && incoming.Message) {
         cg.connections[incoming.Id](incoming.Message);
@@ -35,15 +36,15 @@ cg.onmessage = function (event_) {
 // called when the connection breaks. we only kick off a
 // reconnect loop if we're not already in such a loop
 cg.onclose = function () {
-    console.log("connection closed");
     if (!cg.retryingConnection) {
+        cg.log_to_el("connection closed, retrying");
         cg.retryConnection(0);
     }
 };
 
 // called when there's a connection error. 
 cg.onerror = function() {
-    console.log("connection error");
+    cg.log_to_el("connection error");
 };
 
 // create a websocket connection and set it up with
@@ -75,13 +76,13 @@ cg.checkConnection = function(retryAttempt) {
     var retryAttempt = (typeof(retryAttempt) === "undefined") ? 0 : retryAttempt;
     var retryTime = Math.pow(2, retryAttempt) * 1000;
     if (cg.socket.readyState === 1) {
-        console.log("reconnected");
+        cg.log_to_el("reconnected");
         cg.retryingConnection = false;
     } else if (cg.socket.readyState === undefined || cg.socket.readyState > 1) {
         if (retryAttempt > 7) {
-            console.log("done retrying. come back later");
+            cg.log_to_el("done retrying. come back later");
         } else {
-            console.log("nothing yet, will retry in " + retryTime + " ms");
+            cg.log_to_el("retrying in " + retryTime + " ms");
             retryAttempt++;
             setTimeout(function() { 
                 cg.retryConnection(retryAttempt); 
@@ -99,7 +100,7 @@ cg.send_message = function(message, callback) {
         'Id': message_id,
         'Message': message
     }
-    console.log(outgoing);
+    cg.log_to_el(outgoing);
     cg.socket.send(JSON.stringify(outgoing));
 };
 
@@ -111,7 +112,14 @@ cg.random_id = function() {
 };
 
 cg.hello_callback = function(message) {
-    console.log("hello_callback: " + message);
+    cg.log_to_el("hello_callback: " + message);
+};
+
+cg.log_to_el = function(message) {
+    var el = document.getElementById(cg.connection_el_id);
+    var log_el = document.createElement("div");
+    log_el.innerHTML = message;
+    el.appendChild(log_el);
 };
 
 // start the first connection
