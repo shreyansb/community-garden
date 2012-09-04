@@ -50,14 +50,15 @@ cg.onmessage = function (event_) {
 
 // send a message, mark the connection id and callback function
 // and send the message as a JSON string
-cg.send_message = function(message_type, message, callback) {
+cg.send_message = function(message_type, resource, params, callback) {
     var message_id = cg.random_id();
-    var stringified_message = cg.format.to_string(message);
+    var stringified_params = cg.format.to_string(params);
     cg.connections[message_id] = callback;
     outgoing = {
+        'messageType': message_type,
         'id': message_id,
-        'message': stringified_message,
-        'messageType': message_type
+        'resource': resource,
+        'params': stringified_params
     }
     cg.socket.send(JSON.stringify(outgoing));
 };
