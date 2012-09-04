@@ -1,4 +1,3 @@
-var cg = cg || {};
 cg.log = cg.log || {};
 cg.format = cg.format || {};
 
