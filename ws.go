@@ -3,9 +3,6 @@ package main
 import (
 	"code.google.com/p/go.net/websocket"
 	"log"
-	"math/rand"
-	"runtime"
-	"time"
 )
 
 type wsConnection struct {
@@ -14,13 +11,21 @@ type wsConnection struct {
 	id     string
 }
 
+// incoming websocket message
 type wsMessage struct {
+    MessageType int
+    Message string
 	Id      string
-	Message string
+}
+
+// outgoing websocket message
+type wsResponse struct {
+    ResponseType int
+    Response string
+    Id string
 }
 
 func wsHandler(ws *websocket.Conn) {
-	log.Printf("%d goroutines running (via wsHandler)", runtime.NumGoroutine())
 	// create a wsConnection instance
 	wsConn := &wsConnection{
 		ws:     ws,
@@ -36,21 +41,35 @@ func wsHandler(ws *websocket.Conn) {
 			log.Printf("handleMessages Receive error: %v", err)
 			break
 		}
-		go respondToMessage(wsConn, message)
+		go respondToMessage(wsConn, &message)
 	}
 }
 
-func respondToMessage(wsConn *wsConnection, message wsMessage) {
+func respondToMessage(wsConn *wsConnection, message *wsMessage) {
 	/* Respond to an incoming message.
 	   Right now, simulates work by sleeping for a few seconds
 	*/
-	log.Printf("%d goroutines running (via respondToMessage)", runtime.NumGoroutine())
-	log.Printf("%v is processing a message", wsConn.id)
-	time.Sleep(time.Duration(rand.Int31n(5000)) * time.Millisecond)
-	log.Printf("%v responded: %s", wsConn.id, message)
-	err := websocket.JSON.Send(wsConn.ws, message)
+    log.Printf("%v received: %v", wsConn.id, *message)
+    response := parseAndProcessMessage(wsConn, message)
+	log.Printf("%v responded: %v", wsConn.id, response)
+	err := websocket.JSON.Send(wsConn.ws, response)
 	if err != nil {
 		log.Printf("handleMessages Send error: %v", err)
 		return
 	}
 }
+
+func parseAndProcessMessage(wsConn *wsConnection, message *wsMessage) (wsResponse) {
+    response_json := "response json"
+    response := wsResponse{82, response_json, message.getId()}
+    return response
+}
+
+///
+/// methods that operate on a *wsMessage
+///
+
+func (message *wsMessage) getId() (string) {
+    return (*message).Id
+}
+
