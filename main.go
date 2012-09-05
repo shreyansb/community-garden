@@ -32,6 +32,8 @@ func main() {
 	}
 	http.Handle("/ws", websocket.Handler(wsHandler))
 
+	setupRedisConnection()
+
 	// start the server after getting either a user-entered or default :port
 	flag.Parse()
 	log.Printf("ListenAndServe: starting on localhost%s", *port)

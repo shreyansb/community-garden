@@ -30,7 +30,9 @@ var (
 		MESSAGE_TYPE_UNSUBSCRIBE: "unsubscribe",
 	}
 	routes = map[string]func(*wsConnection, *wsMessage) wsResponse{
-		"get:user": getUserHandler,
+		"get:user":       getUserHandler,
+		"post:user":      postUserHandler,
+		"subscribe:user": subscribeUserHandler,
 	}
 )
 
@@ -52,7 +54,7 @@ type wsMessage struct {
 type wsResponse struct {
 	ResponseType int
 	Id           string
-	Response     string
+	Response     interface{}
 }
 
 func wsHandler(ws *websocket.Conn) {
@@ -98,6 +100,16 @@ func parseAndProcessMessage(wsConn *wsConnection, message *wsMessage) wsResponse
 	return routes[route](wsConn, message)
 }
 
+func errorResponse(wsConn *wsConnection, message *wsMessage, errorMessage string) wsResponse {
+	return wsResponse{RESPONSE_TYPE_ERROR, message.getId(), errorMessage}
+}
+
+func successResponse(wsConn *wsConnection,
+	message *wsMessage,
+	response interface{}) wsResponse {
+	return wsResponse{RESPONSE_TYPE_SUCCESS, message.getId(), response}
+}
+
 ///
 /// methods that operate on a *wsMessage
 ///
@@ -113,4 +125,7 @@ func (message *wsMessage) getResource() string {
 }
 func (message *wsMessage) getParams() string {
 	return (*message).Params
+}
+func (message *wsMessage) getParamBytes() []byte {
+	return []byte(message.getParams())
 }
