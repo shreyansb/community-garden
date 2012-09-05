@@ -3,15 +3,18 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"labix.org/v2/mgo/bson"
 	"log"
 )
 
 type User struct {
-	Id   int
-	Name string
+	Id        int
+	FirstName string
+	LastName  string
+	Email     string
 }
 
-type getUserParamsStruct struct {
+type getUserParams struct {
 	Id int
 }
 
@@ -20,7 +23,7 @@ type getUserParamsStruct struct {
 ///
 
 func getUserHandler(wsConn *wsConnection, message *wsMessage) wsResponse {
-	var getUserParams getUserParamsStruct
+	var getUserParams getUserParams
 	paramBytes := message.getParamBytes()
 	err := json.Unmarshal(paramBytes, &getUserParams)
 	if err != nil {
@@ -59,14 +62,33 @@ func subscribeUserHandler(wsConn *wsConnection, message *wsMessage) wsResponse {
 
 func getUserById(id int) (User, error) {
 	keyString := fmt.Sprintf("user:%d", id)
-	userValue, err := redisConn.Hget(keyString, "name")
-	log.Printf("redisResult: %v, %v", userValue, err)
-	user := User{id, string(userValue)}
+	firstName, _ := redisConn.Hget(keyString, "firstName")
+	lastName, _ := redisConn.Hget(keyString, "lastName")
+	email, _ := redisConn.Hget(keyString, "email")
+	user := User{id, string(firstName), string(lastName), string(email)}
+
+	mongoUser := User{}
+	c := mongoClient.DB("cg").C("users")
+	err := c.Find(bson.M{"id": id}).One(&mongoUser)
+	if err != nil {
+		log.Printf("couldn't find user: ", err)
+	} else {
+		log.Printf("mongo user: %v", mongoUser)
+	}
+
 	return user, nil
 }
 
 func createUser(user User) error {
 	keyString := fmt.Sprintf("user:%d", user.Id)
-	redisConn.Hset(keyString, "name", []byte(user.Name))
+	redisConn.Hset(keyString, "firstName", []byte(user.FirstName))
+	redisConn.Hset(keyString, "lastName", []byte(user.LastName))
+	redisConn.Hset(keyString, "email", []byte(user.Email))
+
+	c := mongoClient.DB("cg").C("users")
+	err := c.Insert(&user)
+	if err != nil {
+		log.Printf("couldn't save user to db: ", err)
+	}
 	return nil
 }
