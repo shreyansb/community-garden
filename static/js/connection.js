@@ -55,7 +55,7 @@ cg.send_message = function(message_type, resource, params, callback) {
     var stringified_params = cg.format.to_string(params);
     cg.connections[message_id] = callback;
     outgoing = {
-        'messageType': message_type,
+        'type': message_type,
         'id': message_id,
         'resource': resource,
         'params': stringified_params

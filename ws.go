@@ -44,17 +44,17 @@ type wsConnection struct {
 
 // incoming websocket message
 type wsMessage struct {
-	MessageType int
-	Id          string
-	Resource    string
-	Params      string
+	Type     int
+	Id       string
+	Resource string
+	Params   string
 }
 
 // outgoing websocket message
 type wsResponse struct {
-	ResponseType int
-	Id           string
-	Response     interface{}
+	Code int
+	Id   string
+	Resp interface{}
 }
 
 func wsHandler(ws *websocket.Conn) {
@@ -94,9 +94,9 @@ func respondToMessage(wsConn *wsConnection, message *wsMessage) {
 func parseAndProcessMessage(wsConn *wsConnection, message *wsMessage) wsResponse {
 	/*
 	 */
-	messageTypeString := messageTypes[message.getMessageType()]
+	messageType := messageTypes[message.getType()]
 	resource := message.getResource()
-	route := fmt.Sprintf("%s:%s", messageTypeString, resource)
+	route := fmt.Sprintf("%s:%s", messageType, resource)
 	return routes[route](wsConn, message)
 }
 
@@ -117,8 +117,8 @@ func successResponse(wsConn *wsConnection,
 func (message *wsMessage) getId() string {
 	return (*message).Id
 }
-func (message *wsMessage) getMessageType() int {
-	return (*message).MessageType
+func (message *wsMessage) getType() int {
+	return (*message).Type
 }
 func (message *wsMessage) getResource() string {
 	return (*message).Resource

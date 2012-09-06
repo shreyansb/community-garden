@@ -47,7 +47,7 @@ func postUserHandler(wsConn *wsConnection, message *wsMessage) wsResponse {
 		log.Printf("error creating user: ", err)
 	}
 	log.Printf("posted User: %v", user)
-	response := wsResponse{RESPONSE_TYPE_SUCCESS, message.getId(), "Posted"}
+	response := wsResponse{RESPONSE_TYPE_SUCCESS, message.getId(), user.Id}
 	return response
 }
 
