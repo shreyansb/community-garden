@@ -14,10 +14,10 @@ var (
 	/// redis
 	redisSpec  = redis.DefaultSpec()
 	redisConn  redis.Client
-	redisError interface{}
+	redisError redis.Error
 	/// mongo
 	mongoClient *mongo.Session
-	mongoError  interface{}
+	mongoError  error
 )
 
 func setupRedisConnection() {
@@ -41,4 +41,9 @@ func setupMongoConnection() {
 func setupDBConnections() {
 	go setupRedisConnection()
 	go setupMongoConnection()
+}
+
+func closeDBConnections() {
+	mongoClient.Close()
+	log.Printf("closed mongo connection.")
 }

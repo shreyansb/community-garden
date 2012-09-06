@@ -34,6 +34,7 @@ func main() {
 
 	// set up global database connections
 	setupDBConnections()
+	defer closeDBConnections()
 
 	// start the server after getting either a user-entered or default :port
 	flag.Parse()
