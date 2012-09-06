@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/go.net/websocket"
 	"fmt"
 	"log"
+	"strconv"
 )
 
 const (
@@ -43,19 +44,10 @@ type wsConnection struct {
 }
 
 // incoming websocket message
-type wsMessage struct {
-	Type     int
-	Id       string
-	Resource string
-	Params   string
-}
+type wsMessage [4]string
 
 // outgoing websocket message
-type wsResponse struct {
-	Code int
-	Id   string
-	Resp interface{}
-}
+type wsResponse [3]string
 
 func wsHandler(ws *websocket.Conn) {
 	// create a wsConnection instance
@@ -101,13 +93,18 @@ func parseAndProcessMessage(wsConn *wsConnection, message *wsMessage) wsResponse
 }
 
 func errorResponse(wsConn *wsConnection, message *wsMessage, errorMessage string) wsResponse {
-	return wsResponse{RESPONSE_TYPE_ERROR, message.getId(), errorMessage}
+	return wsResponse{string(RESPONSE_TYPE_ERROR), message.getId(), errorMessage}
 }
 
-func successResponse(wsConn *wsConnection,
+func successResponse(
+	wsConn *wsConnection,
 	message *wsMessage,
 	response interface{}) wsResponse {
-	return wsResponse{RESPONSE_TYPE_SUCCESS, message.getId(), response}
+	return wsResponse{
+		strconv.Itoa(RESPONSE_TYPE_SUCCESS),
+		message.getId(),
+		fmt.Sprintf("%v", response),
+	}
 }
 
 ///
@@ -115,16 +112,17 @@ func successResponse(wsConn *wsConnection,
 ///
 
 func (message *wsMessage) getId() string {
-	return (*message).Id
+	return (*message)[1]
 }
 func (message *wsMessage) getType() int {
-	return (*message).Type
+	messageType, _ := strconv.Atoi((*message)[0])
+	return messageType
 }
 func (message *wsMessage) getResource() string {
-	return (*message).Resource
+	return (*message)[2]
 }
 func (message *wsMessage) getParams() string {
-	return (*message).Params
+	return (*message)[3]
 }
 func (message *wsMessage) getParamBytes() []byte {
 	return []byte(message.getParams())

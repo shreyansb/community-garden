@@ -47,13 +47,11 @@ func postUserHandler(wsConn *wsConnection, message *wsMessage) wsResponse {
 		log.Printf("error creating user: ", err)
 	}
 	log.Printf("posted User: %v", user)
-	response := wsResponse{RESPONSE_TYPE_SUCCESS, message.getId(), user.Id}
-	return response
+	return successResponse(wsConn, message, user.Id)
 }
 
 func subscribeUserHandler(wsConn *wsConnection, message *wsMessage) wsResponse {
-	response := wsResponse{RESPONSE_TYPE_SUCCESS, message.getId(), "Subscribed"}
-	return response
+	return successResponse(wsConn, message, "Subscribed")
 }
 
 ///

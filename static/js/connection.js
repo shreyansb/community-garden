@@ -40,8 +40,8 @@ cg.onerror = function() {
 cg.onmessage = function (event_) {
     cg.log.to_el("received message: " + event_.data);
     var incoming = JSON.parse(event_.data);
-    if (incoming.Id && incoming.Message) {
-        cg.connections[incoming.Id](incoming.Message);
+    if (incoming.length === 3 && incoming[0] === '200') {
+        cg.connections[incoming[1]](incoming[2]);
     } else {
         var d = new Date();
         cg.failedIncomingMessages[d.toISOString()] = incoming;
@@ -54,12 +54,7 @@ cg.send_message = function(message_type, resource, params, callback) {
     var message_id = cg.random_id();
     var stringified_params = cg.format.to_string(params);
     cg.connections[message_id] = callback;
-    outgoing = {
-        'type': message_type,
-        'id': message_id,
-        'resource': resource,
-        'params': stringified_params
-    }
+    outgoing = [message_type.toString(), message_id, resource, stringified_params];
     cg.socket.send(JSON.stringify(outgoing));
 };
 
